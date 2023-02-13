@@ -1,0 +1,5 @@
+Bluetooth Speaker,  500, 550
+External HDD,      2350, 210
+Power Bank,         850, 340
+USB Hub,           1100,  40
+Wireless Mouse,     460,  90
