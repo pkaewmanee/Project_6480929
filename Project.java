@@ -64,7 +64,7 @@ class Customer{
 }
 
 class Order{
-    //Need to finish this before implement in Product and Customer
+
 }
 
 //Feel free to make duplicate method in this class for file handling and caught Exception
