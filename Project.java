@@ -24,22 +24,43 @@ public class Project1 {
 
 class Product{
     private String productName;
-    private int productPrice, productWeight;
+    private int productPrice, productWeight, totalUnits, totalSales;
     
     public Product(String n, int p, int w){
-        productName = n;
-        productPrice = p;
-        productWeight = w;
+        this.productName = n;
+        this.productPrice = p;
+        this.productWeight = w;
+        this.totalSales = 0;
+        this.totalUnits = 0;
     }
     
-    //should have variables to keep total sales in cash and total sales in units
+    public int calculateTotalSales(int units){
+        int totalSales = units * productPrice;
+        return totalSales;
+    }
 }
 
 class Customer{
-    private String customerName;
-    private int cashBack;
+    private String name;
+    private int cashBacks;
     
+    public Customer(String n){
+        this.name = n;
+        this.cashBacks = 0;
+    }
     
+    public int cashBackRedemtion(int totalBills){
+        int MaxCashBacks = Math.min(cashBacks, 100);
+        int redemption = Math.min(MaxCashBacks, totalBills);
+        cashBacks -= redemption;
+        return redemption;
+    }
+    
+    public void addCashBacks(int totalPrices){
+        double earnCashBack = Math.floor(totalPrices * 0.01);
+        cashBacks += earnCashBack;
+        int cashBacksInt = (int) cashBacks;  //get rid of demimal
+    }
 }
 
 class Order{
