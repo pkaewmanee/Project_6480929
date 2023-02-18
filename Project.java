@@ -517,16 +517,29 @@ class FileHandler {
                     } else {
                         order[i] = Integer.parseInt(buf[i + 3].trim());
                     }
+                    if (order[i] < 0) {
+                        order[i] = 0;
+                        throw new InvalidInputException("For input: " + buf[i + 3].trim());
+                    }
                 } catch (NumberFormatException e) {
                     System.out.println(e);
-                    System.out.println(line + "\n");
+                    System.out.println(line);
                     order[i] = 0;
-                    System.out.printf("[%d,%s,%s,%d,%d,%d,%d,%d]\n", orderNum, name, shipping,
+                    System.out.print("Original [" + line + "] =========> ");
+                    System.out.printf("Correction [%d, %s, %s, %d, %d, %d, %d, %d]\n\n", orderNum, name, shipping,
+                            order[0], order[1], order[2], order[3], order[4]);
+                } catch (InvalidInputException e) {
+                    System.out.println(e);
+                    System.out.println(line);
+                    order[i] = 0;
+                    System.out.print("Original [" + line + "] =========> ");
+                    System.out.printf("Correction [%d, %s, %s, %d, %d, %d, %d, %d]\n\n", orderNum, name, shipping,
                             order[0], order[1], order[2], order[3], order[4]);
                 }
+
             }
 
-            for (i = 0; i < 5; i++) {
+            /*for (i = 0; i < 5; i++) {
                 try {
                     if (order[i] < 0) {
                         order[i] = 0;
@@ -534,13 +547,13 @@ class FileHandler {
                     }
                 } catch (InvalidInputException e) {
                     System.out.println(e);
-                    System.out.println(line + "\n");
+                    System.out.println(line);
                     order[i] = 0;
+                    System.out.print("Original [" + line + "] =========> ");
+                    System.out.printf("Correction [%d, %s, %s, %d, %d, %d, %d, %d]\n\n", orderNum, name, shipping,
+                            order[0], order[1], order[2], order[3], order[4]);
                 }
-            }
-
-            System.out.printf("[%d,%s,%s,%d,%d,%d,%d,%d]\n", orderNum, name, shipping,
-                    order[0], order[1], order[2], order[3], order[4]);
+            }*/
 
             if (buf.length < 8) {
                 throw new InvalidInputException("Invalid input: " + line);
