@@ -94,8 +94,8 @@ class Customer {
         return name;
     }
 
-    public int cashBackRedemtion(int totalBills) {
-        int MaxCashBacks = Math.min(cashBacks, 100);
+    public int cashBackRedemption(int totalBills) {
+        int MaxCashBacks = Math.max(0, Math.min(cashBacks, 100));
         int redemption = Math.min(MaxCashBacks, totalBills);
         cashBacks -= redemption;
         return redemption;
@@ -103,8 +103,8 @@ class Customer {
 
     public void addCashBacks(int totalPrices) {
         double earnCashBack = Math.floor(totalPrices * 0.01);
-        cashBacks += earnCashBack;
         int cashBacksInt = (int) cashBacks;  //get rid of demimal
+        cashBacks += earnCashBack;
     }
 
     public void print() {
@@ -175,39 +175,52 @@ class Order {
         totalWeight = 0;
 
         //Calcualte total price and weight
-        totalPrice = p[0].returnPrice() * item1;
-        totalWeight = p[0].returnWeight() * item1;
-
-        totalPrice = totalPrice + (p[1].returnPrice() * item2);
-        totalWeight = totalWeight + (p[1].returnWeight() * item2);
-
-        totalPrice = totalPrice + (p[2].returnPrice() * item3);
-        totalWeight = totalWeight + (p[2].returnWeight() * item3);
-
-        totalPrice = totalPrice + (p[3].returnPrice() * item4);
-        totalWeight = totalWeight + (p[3].returnWeight() * item4);
-
-        totalPrice = totalPrice + (p[4].returnPrice() * item5);
-        totalWeight = totalWeight + (p[4].returnWeight() * item5);
+        for (int i = 0; i < p.length; i++) {
+        int item = 0;
+        switch (i) {
+            case 0:
+                item = item1;
+                break;
+            case 1:
+                item = item2;
+                break;
+            case 2:
+                item = item3;
+                break;
+            case 3:
+                item = item4;
+                break;
+            case 4:
+                item = item5;
+                break;
+        }
+        totalPrice += p[i].returnPrice() * item;
+        totalWeight += p[i].returnWeight() * item;
+    }
 
         //Cashback System
-        boolean costomerFind = false;
-        Customer find = c.get(0);
-        for (int i = 0; i < c.size(); i++) {
-            if (costomerFind == false) {
-                find = c.get(i);
+        Customer customer = null;
+            for (Customer cust : c) {
+                if (cust.returnName().equals(orderName)) {
+                customer = cust;
+                break;
+                }
             }
-            if (orderName.equals(find.returnName())) {
-                costomerFind = true;
+            if (customer == null) {
+                customer = new Customer(orderName);
+                c.add(customer);
             }
-        }
-        int cashback = find.cashBackRedemtion(totalPrice);
-        find.addCashBacks(totalPrice);
-        int futureCashback = find.cashBackRedemtion(totalPrice);
-        totalPrice = totalPrice - cashback;
+
+        int currentCashback = customer.returnCashback();
+        int redeemedCashback = customer.cashBackRedemption(totalPrice);
+        int discountedPrice = totalPrice - redeemedCashback;
+        customer.addCashBacks(totalPrice);
+        int futureCashback = customer.returnCashback();
 
         //CHANGE FOR SHIPPING
-        //CHANGE FOR SHIPPING
+        int shippingId;
+        String shippingType;
+        int shippingPrice = 0;
         if (shipping.equalsIgnoreCase("S")) {
             shippingId = 0;
             shippingType = "(standard)";
@@ -215,39 +228,18 @@ class Order {
             shippingId = 1;
             shippingType = "(express)";
         }
+        
+        int shippingFee = ShippingCalculator.Calculate(shippingId, shippingType, totalWeight, shipping, shippingPrice, shippingcal);
+        int finalBill = discountedPrice + shippingFee;
 
-        shippingPrice = ShippingCalculator.Calculate(shippingId, shippingType, totalWeight, shipping, shippingPrice, shippingcal);
-
-        finalBill = totalPrice + shippingPrice;
-
-        //Printing Everything
-        //Order number, shipping type, orderer
-        System.out.printf("\nOrder %2d%11s,%6s >> ",
-                orderNumber, shippingType, orderName);
-
-        //Item types and quainty
-        System.out.printf("%17s(%2d)%17s(%2d)%17s(%2d)%17s(%2d)%17s(%2d)",
-                p[0].returnName(), item1, p[1].returnName(), item2,
+        System.out.printf("\nOrder %2d%11s,%6s >> ", orderNumber, shippingType, orderName);
+        System.out.printf("%17s(%2d)%17s(%2d)%17s(%2d)%17s(%2d)%17s(%2d)", p[0].returnName(), item1, p[1].returnName(), item2,
                 p[2].returnName(), item3, p[3].returnName(), item4,
                 p[4].returnName(), item5);
-
-        //Cashback
-        System.out.printf("\n%40s%6s", ">> Available cashback = ",
-                String.format("%,d", cashback));
-
-        //Total price
-        System.out.printf("\n%40s%6s", ">> Total price = ",
-                String.format("%,d", totalPrice));
-
-        //Total weight
-        System.out.printf("\n%40s%6s%15s%s", ">> Total weight = ",
-                String.format("%,d", totalWeight), "Shipping Fee = ",
-                String.format("%,d", shippingPrice));
-
-        //Final Bill
-        System.out.printf("\n%40s%6s%20s%s\n", ">> Final bill = ",
-                String.format("%,d", finalBill), "Cashback for next order = ",
-                String.format("%,d", futureCashback));
+        System.out.printf("\n%40s%6s", ">> Available cashback = ", String.format("%,d", currentCashback));
+        System.out.printf("\n%40s%6s", ">> Total price = ", String.format("%,d", totalPrice));
+        System.out.printf("\n%40s%6s%25s%s", ">> Total weight = ", String.format("%,d", totalWeight), "Shipping Fee = ", String.format("%,d", shippingFee));
+        System.out.printf("\n%40s%6s%36s%s\n", ">> Final bill = ", String.format("%,d", finalBill), "Cashback for next order = ", String.format("%,d", futureCashback));
     }
 
     public int returntotalWeight() {
