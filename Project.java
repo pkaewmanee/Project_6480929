@@ -267,7 +267,7 @@ class Order {
 
         ShippingCalculation(totalWeight, shippingcal);
 
-        finalBill = totalPrice + 0;
+        finalBill = totalPrice + shippingPrice;
 
         //Printing Everything
         //Order number, shipping type, orderer
