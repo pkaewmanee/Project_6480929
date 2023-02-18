@@ -20,7 +20,7 @@ public class Project {
         String productInFile = "products.txt";
         String orderInFile = "orders.txt";
         String shippingInFile = "shipping.txt";
-        
+
         FileHandler FH = new FileHandler(path, productInFile);
         FH.wrongProductFile_loop(P);
         System.out.println("Read products from file " + path + productInFile + "\n");
@@ -29,17 +29,17 @@ public class Project {
         FileHandler SHF = new FileHandler(path, shippingInFile);
         SHF.wrongShippingFile_loop(shipping);
         System.out.println("Read shipping from file " + path + shippingInFile + "\n");
-        
+
         //GET RID ONCE HAVE SHIPPING
         //Handling Orders Errors
         ArrayList<Order> orders = new ArrayList<>();
         FileHandler OFH = new FileHandler(path, orderInFile);
-        
+
         //Adding each new customer
         ArrayList<Customer> c = new ArrayList<>();
         OFH.wrongOrderFile_loop(orders, c);
         System.out.println("Read orders from file " + path + orderInFile + "\n");
-        
+
         //Order processing and printing
         System.out.printf("\n==== Order Processing ====");
         for (Order o : orders) {
@@ -384,12 +384,12 @@ class ShippingCalculator implements Comparable<ShippingCalculator> {
             totalWeightCounter -= sc4.getSurplusThreshold();
             int deduct = totalWeightCounter / sc4.getWeight();
             shippingPrice += (totalWeightCounter / sc4.getWeight()) * sc4.getFee();
-            
+
             totalWeightCounter -= (deduct * sc4.getWeight());
             if (totalWeightCounter < sc4.getWeight() && totalWeightCounter != 0) {
                 shippingPrice += sc4.getFee();
             }
-            
+
         }
 
         return shippingPrice;
@@ -434,6 +434,13 @@ class ShippingCalculator implements Comparable<ShippingCalculator> {
         return shippingPrice;
     }
 
+}
+
+class InvalidInputException extends RuntimeException {
+
+    public InvalidInputException(String errorMessage) {
+        super(errorMessage);
+    }
 }
 
 //Feel free to make duplicate method in this class for file handling and caught Exception
@@ -497,10 +504,27 @@ class FileHandler {
             int order4 = Integer.parseInt(buf[6].trim());
             int order5 = Integer.parseInt(buf[7].trim());
 
+            if (!"E".equalsIgnoreCase(shipping) && !"S".equalsIgnoreCase(shipping)) {
+                throw new InvalidInputException("For input: " + buf[2].trim());
+            }
+
+            if (buf.length < 8) {
+                throw new InvalidInputException("Invalid input: " + line);
+            }
+
+            if (order1 < 0 || order2 < 0 || order3 < 0 || order4 < 0 || order5 < 0) {
+                throw new InvalidInputException("Negative value");
+            }
+
             Order addNew = new Order(orderNum, name, shipping, order1, order2,
                     order3, order4, order5, c);
             o.add(addNew);
-
+        } catch (NumberFormatException e) {
+            System.out.println(e);
+            System.out.println(line + "\n");
+        } catch (InvalidInputException e) {
+            System.out.println(e);
+            System.out.println(line + "\n");
         } catch (RuntimeException e) {
             System.out.println(e);
             System.out.println(line + "\n");
