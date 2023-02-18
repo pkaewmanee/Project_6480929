@@ -165,59 +165,6 @@ class Order {
         }
     }
 
-    private void ShippingStandardCalculation(int totalWeight, ShippingCalculator sc3, ShippingCalculator sc4) {
-        // Set initial values
-        shippingId = 0;
-        shippingType = "(standard)";
-        int totalWeightCounter = totalWeight;
-
-        // Check if total weight falls within standard shipping limits
-        if (totalWeightCounter > sc3.getStandardMinWeight() && totalWeightCounter <= sc3.getStandardMaxWeight()) {
-            shippingPrice += sc3.getStandardFee();  // If it does, add the standard shipping fee to the price
-        } else {
-            // Otherwise, add the standard shipping fee to the price and start calculating the additional weight surcharge
-            shippingPrice += sc3.getStandardFee();
-            totalWeightCounter -= sc4.getSurplusThreshold();
-            int deduct = totalWeightCounter / sc4.getWeight();
-            shippingPrice += (totalWeightCounter / sc4.getWeight()) * sc4.getFee();
-            totalWeightCounter -= (deduct * sc4.getWeight());
-            if (totalWeightCounter < sc4.getWeight()) {
-                shippingPrice += sc4.getFee();
-            }
-        }
-    }
-
-    private void ShippingCalculation(int totalWeight, ArrayList<ShippingCalculator> shippingcal) {
-        // Initialize array of ShippingCalculator objects
-        ShippingCalculator[] sc = new ShippingCalculator[5];
-
-        int totalWeightCounter = totalWeight;
-        int i = 0;
-
-        // Loop through shippingcal and add each ShippingCalculator object to sc array
-        for (ShippingCalculator shippingCal : shippingcal) {
-            sc[i] = shippingCal;
-            ++i;
-        }
-
-        // Determine shipping type and calculate price accordingly
-        if (shipping.equalsIgnoreCase("S")) {
-            ShippingStandardCalculation(totalWeight, sc[3], sc[4]);  // If standard shipping, call ShippingStandardCalculation method
-        } else {
-            shippingId = 1;
-            shippingType = "(express)";
-            if (totalWeightCounter > sc[0].getExpressMinWeight() && totalWeightCounter <= sc[0].getExpressMaxWeight()) {
-                shippingPrice = sc[0].getExpressFee();
-            } else if (totalWeightCounter > sc[1].getExpressMinWeight() && totalWeightCounter <= sc[1].getExpressMaxWeight()) {
-                shippingPrice = sc[1].getExpressFee();
-            } else if (totalWeightCounter > sc[2].getExpressMinWeight() && totalWeightCounter <= sc[2].getExpressMaxWeight()) {
-                shippingPrice = sc[2].getExpressFee();
-            } else {
-                ShippingStandardCalculation(totalWeight, sc[3], sc[4]);  // If none of the express shipping limits apply, call ShippingStandardCalculation method
-            }
-        }
-    }
-
     public void orderProcessing(Product p[], ArrayList<Customer> c, ArrayList<ShippingCalculator> shippingcal) {
         totalPrice = 0;
         totalWeight = 0;
@@ -259,13 +206,12 @@ class Order {
         if (shipping.equalsIgnoreCase("S")) {
             shippingId = 0;
             shippingType = "(standard)";
-            //Shipping Calculator for Standard
         } else {
             shippingId = 1;
             shippingType = "(express)";
         }
 
-        ShippingCalculation(totalWeight, shippingcal);
+        shippingPrice = ShippingCalculator.Calculate(shippingId, shippingType, totalWeight, shipping, shippingPrice, shippingcal);
 
         finalBill = totalPrice + shippingPrice;
 
@@ -356,47 +302,47 @@ class ShippingCalculator implements Comparable<ShippingCalculator> {
     }
 
     // Public getter methods for private instance variables
-    public String getShippingType() {
+    private String getShippingType() {
         return shipping_type;
     }
 
-    public String getFeeType() {
+    private String getFeeType() {
         return fee_type;
     }
 
-    public int getExpressMinWeight() {
+    private int getExpressMinWeight() {
         return emin_weight;
     }
 
-    public int getExpressMaxWeight() {
+    private int getExpressMaxWeight() {
         return emax_weight;
     }
 
-    public int getExpressFee() {
+    private int getExpressFee() {
         return efee;
     }
 
-    public int getStandardMinWeight() {
+    private int getStandardMinWeight() {
         return smin_weight;
     }
 
-    public int getStandardMaxWeight() {
+    private int getStandardMaxWeight() {
         return smax_weight;
     }
 
-    public int getStandardFee() {
+    private int getStandardFee() {
         return sfee;
     }
 
-    public int getSurplusThreshold() {
+    private int getSurplusThreshold() {
         return surplus_threshold;
     }
 
-    public int getWeight() {
+    private int getWeight() {
         return weight;
     }
 
-    public int getFee() {
+    private int getFee() {
         return fee;
     }
 
@@ -417,6 +363,70 @@ class ShippingCalculator implements Comparable<ShippingCalculator> {
             weight = maw;
             fee = f;
         }
+    }
+
+    private static int ShippingStandardCalculation(int totalWeight, ShippingCalculator sc3, ShippingCalculator sc4) {
+        // Set initial values
+        int totalWeightCounter = totalWeight;
+        int shippingPrice = 0;
+
+        // Check if total weight falls within standard shipping limits
+        if (totalWeightCounter > sc3.getStandardMinWeight() && totalWeightCounter <= sc3.getStandardMaxWeight()) {
+            shippingPrice += sc3.getStandardFee();  // If it does, add the standard shipping fee to the price
+        } else {
+            // Otherwise, add the standard shipping fee to the price and start calculating the additional weight surcharge
+            shippingPrice += sc3.getStandardFee();
+            totalWeightCounter -= sc4.getSurplusThreshold();
+            int deduct = totalWeightCounter / sc4.getWeight();
+            shippingPrice += (totalWeightCounter / sc4.getWeight()) * sc4.getFee();
+            
+            totalWeightCounter -= (deduct * sc4.getWeight());
+            if (totalWeightCounter < sc4.getWeight() && totalWeightCounter != 0) {
+                shippingPrice += sc4.getFee();
+            }
+            
+        }
+
+        return shippingPrice;
+
+    }
+
+    public static int Calculate(int shippingId, String shippingType, int totalWeight, String shipping, int shippingPrice, ArrayList<ShippingCalculator> shippingcal) {
+        // Initialize array of ShippingCalculator objects
+        ShippingCalculator[] sc = new ShippingCalculator[5];
+
+        int totalWeightCounter = totalWeight;
+        shippingPrice = 0;
+        int i = 0;
+
+        // Loop through shippingcal and add each ShippingCalculator object to sc array
+        for (ShippingCalculator shippingCal : shippingcal) {
+            sc[i] = shippingCal;
+            ++i;
+        }
+
+        // Determine shipping type and calculate price accordingly
+        if (shipping.equalsIgnoreCase("S")) {
+            shippingId = 0;
+            shippingType = "(standard)";
+            shippingPrice = ShippingStandardCalculation(totalWeight, sc[3], sc[4]);  // If standard shipping, call ShippingStandardCalculation method
+        } else {
+            shippingId = 1;
+            shippingType = "(express)";
+            if (totalWeightCounter > sc[0].getExpressMinWeight() && totalWeightCounter <= sc[0].getExpressMaxWeight()) {
+                shippingPrice = sc[0].getExpressFee();
+            } else if (totalWeightCounter > sc[1].getExpressMinWeight() && totalWeightCounter <= sc[1].getExpressMaxWeight()) {
+                shippingPrice = sc[1].getExpressFee();
+            } else if (totalWeightCounter > sc[2].getExpressMinWeight() && totalWeightCounter <= sc[2].getExpressMaxWeight()) {
+                shippingPrice = sc[2].getExpressFee();
+            } else {
+                shippingId = 0;
+                shippingType = "(standard)";
+                shippingPrice = ShippingStandardCalculation(totalWeight, sc[3], sc[4]);   // If none of the express shipping limits apply, call ShippingStandardCalculation method
+            }
+        }
+
+        return shippingPrice;
     }
 
 }
