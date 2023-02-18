@@ -17,22 +17,29 @@ public class Project {
 
         Product P[] = new Product[5];
         String path = "src/main/java/Project_6480929/";
-        FileHandler FH = new FileHandler(path, "products.txt");
+        String productInFile = "products.txt";
+        String orderInFile = "orders.txt";
+        String shippingInFile = "shipping.txt";
+        
+        FileHandler FH = new FileHandler(path, productInFile);
         FH.wrongProductFile_loop(P);
+        System.out.println("Read products from file " + path + productInFile + "\n");
 
+        ArrayList<ShippingCalculator> shipping = new ArrayList<>();
+        FileHandler SHF = new FileHandler(path, shippingInFile);
+        SHF.wrongShippingFile_loop(shipping);
+        System.out.println("Read shipping from file " + path + shippingInFile + "\n");
+        
         //GET RID ONCE HAVE SHIPPING
         //Handling Orders Errors
-        ArrayList<Order> orders = new ArrayList<Order>();
-        FileHandler OFH = new FileHandler(path, "orders.txt");
-
+        ArrayList<Order> orders = new ArrayList<>();
+        FileHandler OFH = new FileHandler(path, orderInFile);
+        
         //Adding each new customer
-        ArrayList<Customer> c = new ArrayList<Customer>();
+        ArrayList<Customer> c = new ArrayList<>();
         OFH.wrongOrderFile_loop(orders, c);
-
-        ArrayList<ShippingCalculator> shipping = new ArrayList<ShippingCalculator>();
-        FileHandler SHF = new FileHandler(path, "shipping.txt");
-        SHF.wrongShippingFile_loop(shipping);
-
+        System.out.println("Read orders from file " + path + orderInFile + "\n");
+        
         //Order processing and printing
         System.out.printf("\n==== Order Processing ====");
         for (Order o : orders) {
