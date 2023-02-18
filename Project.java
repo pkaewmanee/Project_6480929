@@ -177,40 +177,40 @@ class Order {
 
         //Calcualte total price and weight
         for (int i = 0; i < p.length; i++) {
-        int item = 0;
-        switch (i) {
-            case 0:
-                item = item1;
-                break;
-            case 1:
-                item = item2;
-                break;
-            case 2:
-                item = item3;
-                break;
-            case 3:
-                item = item4;
-                break;
-            case 4:
-                item = item5;
-                break;
+            int item = 0;
+            switch (i) {
+                case 0:
+                    item = item1;
+                    break;
+                case 1:
+                    item = item2;
+                    break;
+                case 2:
+                    item = item3;
+                    break;
+                case 3:
+                    item = item4;
+                    break;
+                case 4:
+                    item = item5;
+                    break;
+            }
+            totalPrice += p[i].returnPrice() * item;
+            totalWeight += p[i].returnWeight() * item;
         }
-        totalPrice += p[i].returnPrice() * item;
-        totalWeight += p[i].returnWeight() * item;
-    }
 
         //Cashback System
         Customer customer = null;
-            for (Customer cust : c) {
-                if (cust.returnName().equals(orderName)) {
+        for (Customer cust : c) {
+            if (cust.returnName().equals(orderName)) {
                 customer = cust;
                 break;
-                }
             }
-            if (customer == null) {
-                customer = new Customer(orderName);
-                c.add(customer);
-            }
+        }
+        if (customer == null) {
+            customer = new Customer(orderName);
+            c.add(customer);
+        }
 
         int currentCashback = customer.returnCashback();
         int redeemedCashback = customer.cashBackRedemption(totalPrice);
@@ -229,7 +229,7 @@ class Order {
             shippingId = 1;
             shippingType = "(express)";
         }
-        
+
         int shippingFee = ShippingCalculator.Calculate(shippingId, shippingType, totalWeight, shipping, shippingPrice, shippingcal);
         int finalBill = discountedPrice + shippingFee;
 
