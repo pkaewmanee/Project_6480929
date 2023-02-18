@@ -18,7 +18,7 @@ public class Project {
         Product P[] = new Product[5];
         String path = "src/main/java/Project_6480929/";
         String productInFile = "products.txt";
-        String orderInFile = "orders.txt";
+        String orderInFile = "orders_errors.txt";
         String shippingInFile = "shipping.txt";
 
         FileHandler FH = new FileHandler(path, productInFile);
@@ -498,33 +498,57 @@ class FileHandler {
             int orderNum = Integer.parseInt(buf[0].trim());
             String name = buf[1].trim();
             String shipping = buf[2].trim();
-            int order1 = Integer.parseInt(buf[3].trim());
-            int order2 = Integer.parseInt(buf[4].trim());
-            int order3 = Integer.parseInt(buf[5].trim());
-            int order4 = Integer.parseInt(buf[6].trim());
-            int order5 = Integer.parseInt(buf[7].trim());
+
+            int[] order = new int[5];
+            int i;
 
             if (!"E".equalsIgnoreCase(shipping) && !"S".equalsIgnoreCase(shipping)) {
+                shipping = "S";
                 throw new InvalidInputException("For input: " + buf[2].trim());
             }
+
+            for (i = 0; i < 5; i++) {
+                try {
+                    if (!"E".equalsIgnoreCase(shipping) && !"S".equalsIgnoreCase(shipping)) {
+                        shipping = "S";
+                        order[i] = Integer.parseInt(buf[2].trim());
+                        ++i;
+                        throw new InvalidInputException("For input: " + buf[2].trim());
+                    } else {
+                        order[i] = Integer.parseInt(buf[i + 3].trim());
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println(e);
+                    System.out.println(line + "\n");
+                    order[i] = 0;
+                    System.out.printf("[%d,%s,%s,%d,%d,%d,%d,%d]\n", orderNum, name, shipping,
+                            order[0], order[1], order[2], order[3], order[4]);
+                }
+            }
+
+            for (i = 0; i < 5; i++) {
+                try {
+                    if (order[i] < 0) {
+                        order[i] = 0;
+                        throw new InvalidInputException("For input: " + buf[i + 3].trim());
+                    }
+                } catch (InvalidInputException e) {
+                    System.out.println(e);
+                    System.out.println(line + "\n");
+                    order[i] = 0;
+                }
+            }
+
+            System.out.printf("[%d,%s,%s,%d,%d,%d,%d,%d]\n", orderNum, name, shipping,
+                    order[0], order[1], order[2], order[3], order[4]);
 
             if (buf.length < 8) {
                 throw new InvalidInputException("Invalid input: " + line);
             }
 
-            if (order1 < 0 || order2 < 0 || order3 < 0 || order4 < 0 || order5 < 0) {
-                throw new InvalidInputException("Negative value");
-            }
-
-            Order addNew = new Order(orderNum, name, shipping, order1, order2,
-                    order3, order4, order5, c);
+            Order addNew = new Order(orderNum, name, shipping, order[0], order[1],
+                    order[2], order[3], order[4], c);
             o.add(addNew);
-        } catch (NumberFormatException e) {
-            System.out.println(e);
-            System.out.println(line + "\n");
-        } catch (InvalidInputException e) {
-            System.out.println(e);
-            System.out.println(line + "\n");
         } catch (RuntimeException e) {
             System.out.println(e);
             System.out.println(line + "\n");
