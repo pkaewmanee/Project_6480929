@@ -31,6 +31,14 @@ public class Project {
     ArrayList<Customer> c = new ArrayList<Customer>();
     OFH.wrongOrderFile_loop(orders,c);
     
+    ArrayList<ShippingCalculator> shipping = new ArrayList<ShippingCalculator>();
+    FileHandler SHF = new FileHandler(path, "shipping.txt");
+    SHF.wrongShippingFile_loop(shipping);
+    
+        //Test print
+    System.out.printf("\n==== Shipping Processing ====");
+    for (ShippingCalculator sc : shipping) sc.print();
+    
     //Order processing and printing
     System.out.printf("\n==== Order Processing ====");
     for (Order o : orders) o.orderProcessing(P,c);
@@ -231,6 +239,27 @@ class Order{
     }  
 }
 
+class ShippingCalculator{
+    private String shipping_type;
+    private String fee_type;
+    private int min_weight;
+    private int max_weight;
+    private int fee;
+    
+    public ShippingCalculator(String st, String ft, int miw, int maw, int f){
+        shipping_type = st;
+        fee_type = ft;
+        min_weight = miw;
+        max_weight = maw;
+        fee = f;
+    }
+    
+    
+    public void print(){
+        System.out.printf("%s%s%d%d%d",shipping_type,fee_type,min_weight,max_weight,fee);
+    }
+}
+
 //Feel free to make duplicate method in this class for file handling and caught Exception
 //Every file handling method will be put in this class!!
 class FileHandler{
@@ -317,4 +346,42 @@ class FileHandler{
             }
         }
     }
+    
+    public void shippingFileProcessLine(String line, ArrayList<ShippingCalculator> sc){
+        try{
+            String [] buf = line.split(",");
+            
+                String shipping_type = buf[0].trim();
+                String fee_type = buf[1].trim();
+                int min_weight = Integer.parseInt(buf[2].trim());
+                int max_weight = Integer.parseInt(buf[3].trim());
+                int fee = Integer.parseInt(buf[4].trim());
+                
+                ShippingCalculator addNew = new ShippingCalculator(shipping_type, fee_type, min_weight, max_weight, fee);
+                
+                sc.add(addNew);
+                
+        }catch(RuntimeException e){   
+            System.out.println(e);
+            System.out.println(line + "\n");
+        }
+    }
+    
+    public void wrongShippingFile_loop(ArrayList<ShippingCalculator> sc){
+                boolean opensuccess = false;
+        while (!opensuccess){
+            try(Scanner fileScan = new Scanner(new File(path + fileName))){
+                opensuccess = true;
+                while(fileScan.hasNext()){
+                    shippingFileProcessLine(fileScan.nextLine(), sc);
+                }
+            }catch(FileNotFoundException e){
+                System.out.println(e);
+                System.out.println("New file name = ");
+                fileName = keyboardScan.next();
+                System.out.print("\n");
+            }
+        }
+    }
+    
 }
