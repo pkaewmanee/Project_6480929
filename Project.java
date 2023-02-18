@@ -443,6 +443,13 @@ class InvalidInputException extends RuntimeException {
     }
 }
 
+class MissingFormatException extends java.lang.ArrayIndexOutOfBoundsException {
+
+    public MissingFormatException(String errorMessage) {
+        super(errorMessage);
+    }
+}
+
 //Feel free to make duplicate method in this class for file handling and caught Exception
 //Every file handling method will be put in this class!!
 class FileHandler {
@@ -500,23 +507,27 @@ class FileHandler {
             String shipping = buf[2].trim();
 
             int[] order = new int[5];
-            int i;
-
-            if (!"E".equalsIgnoreCase(shipping) && !"S".equalsIgnoreCase(shipping)) {
-                shipping = "S";
-                throw new InvalidInputException("For input: " + buf[2].trim());
-            }
+            int i, j = 0;
 
             for (i = 0; i < 5; i++) {
                 try {
-                    if (!"E".equalsIgnoreCase(shipping) && !"S".equalsIgnoreCase(shipping)) {
+                    if (buf.length < 8 && shipping.matches("\\d+")) {
                         shipping = "S";
-                        order[i] = Integer.parseInt(buf[2].trim());
-                        ++i;
-                        throw new InvalidInputException("For input: " + buf[2].trim());
-                    } else {
-                        order[i] = Integer.parseInt(buf[i + 3].trim());
+                        j = 1;
+                        order[0] = Integer.parseInt(buf[2].trim());
+                        throw new MissingFormatException(" 1 columns missing");
                     }
+
+                    if (!"E".equalsIgnoreCase(shipping) && !"S".equalsIgnoreCase(shipping) && shipping.matches("\\d+")) {
+                        order[0] = Integer.parseInt(buf[2].trim());
+                        throw new InvalidInputException("For input: " + buf[2].trim());
+                    } else if (!"E".equalsIgnoreCase(shipping) && !"S".equalsIgnoreCase(shipping)) {
+                        shipping = "S";
+                        order[i] = Integer.parseInt(buf[i + 3].trim());
+                    } else {
+                        order[i] = Integer.parseInt(buf[i + 3 - j].trim());
+                    }
+
                     if (order[i] < 0) {
                         order[i] = 0;
                         throw new InvalidInputException("For input: " + buf[i + 3].trim());
@@ -524,40 +535,21 @@ class FileHandler {
                 } catch (NumberFormatException e) {
                     System.out.println(e);
                     System.out.println(line);
-                    order[i] = 0;
                     System.out.print("Original [" + line + "] =========> ");
                     System.out.printf("Correction [%d, %s, %s, %d, %d, %d, %d, %d]\n\n", orderNum, name, shipping,
                             order[0], order[1], order[2], order[3], order[4]);
                 } catch (InvalidInputException e) {
                     System.out.println(e);
                     System.out.println(line);
-                    order[i] = 0;
-                    System.out.print("Original [" + line + "] =========> ");
-                    System.out.printf("Correction [%d, %s, %s, %d, %d, %d, %d, %d]\n\n", orderNum, name, shipping,
-                            order[0], order[1], order[2], order[3], order[4]);
-                }
-
-            }
-
-            /*for (i = 0; i < 5; i++) {
-                try {
-                    if (order[i] < 0) {
-                        order[i] = 0;
-                        throw new InvalidInputException("For input: " + buf[i + 3].trim());
-                    }
-                } catch (InvalidInputException e) {
+                } catch (MissingFormatException e) {
                     System.out.println(e);
                     System.out.println(line);
-                    order[i] = 0;
-                    System.out.print("Original [" + line + "] =========> ");
-                    System.out.printf("Correction [%d, %s, %s, %d, %d, %d, %d, %d]\n\n", orderNum, name, shipping,
-                            order[0], order[1], order[2], order[3], order[4]);
                 }
-            }*/
-
-            if (buf.length < 8) {
-                throw new InvalidInputException("Invalid input: " + line);
             }
+
+            System.out.print("Original [" + line + "] =========> ");
+            System.out.printf("Correction [%d, %s, %s, %d, %d, %d, %d, %d]\n\n", orderNum, name, shipping,
+                    order[0], order[1], order[2], order[3], order[4]);
 
             Order addNew = new Order(orderNum, name, shipping, order[0], order[1],
                     order[2], order[3], order[4], c);
