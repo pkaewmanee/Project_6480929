@@ -129,6 +129,10 @@ class Order {
     //Total price and weight
     private int totalPrice, totalWeight, finalBill;
 
+    private int getShippingPrice() {
+        return shippingPrice;
+    }
+
     public Order(int orderNum, String n, String s, int i1, int i2, int i3,
             int i4, int i5, ArrayList<Customer> c) {
         orderNumber = orderNum;
@@ -158,6 +162,59 @@ class Order {
         if (costomerCheck == true) {
             Customer addCustomer = new Customer(orderName);
             c.add(addCustomer);
+        }
+    }
+
+    private void ShippingStandardCalculation(int totalWeight, ShippingCalculator sc3, ShippingCalculator sc4) {
+        // Set initial values
+        shippingId = 0;
+        shippingType = "(standard)";
+        int totalWeightCounter = totalWeight;
+
+        // Check if total weight falls within standard shipping limits
+        if (totalWeightCounter > sc3.getStandardMinWeight() && totalWeightCounter <= sc3.getStandardMaxWeight()) {
+            shippingPrice += sc3.getStandardFee();  // If it does, add the standard shipping fee to the price
+        } else {
+            // Otherwise, add the standard shipping fee to the price and start calculating the additional weight surcharge
+            shippingPrice += sc3.getStandardFee();
+            totalWeightCounter -= sc4.getSurplusThreshold();
+            int deduct = totalWeightCounter / sc4.getWeight();
+            shippingPrice += (totalWeightCounter / sc4.getWeight()) * sc4.getFee();
+            totalWeightCounter -= (deduct * sc4.getWeight());
+            if (totalWeightCounter < sc4.getWeight()) {
+                shippingPrice += sc4.getFee();
+            }
+        }
+    }
+
+    private void ShippingCalculation(int totalWeight, ArrayList<ShippingCalculator> shippingcal) {
+        // Initialize array of ShippingCalculator objects
+        ShippingCalculator[] sc = new ShippingCalculator[5];
+
+        int totalWeightCounter = totalWeight;
+        int i = 0;
+
+        // Loop through shippingcal and add each ShippingCalculator object to sc array
+        for (ShippingCalculator shippingCal : shippingcal) {
+            sc[i] = shippingCal;
+            ++i;
+        }
+
+        // Determine shipping type and calculate price accordingly
+        if (shipping.equalsIgnoreCase("S")) {
+            ShippingStandardCalculation(totalWeight, sc[3], sc[4]);  // If standard shipping, call ShippingStandardCalculation method
+        } else {
+            shippingId = 1;
+            shippingType = "(express)";
+            if (totalWeightCounter > sc[0].getExpressMinWeight() && totalWeightCounter <= sc[0].getExpressMaxWeight()) {
+                shippingPrice = sc[0].getExpressFee();
+            } else if (totalWeightCounter > sc[1].getExpressMinWeight() && totalWeightCounter <= sc[1].getExpressMaxWeight()) {
+                shippingPrice = sc[1].getExpressFee();
+            } else if (totalWeightCounter > sc[2].getExpressMinWeight() && totalWeightCounter <= sc[2].getExpressMaxWeight()) {
+                shippingPrice = sc[2].getExpressFee();
+            } else {
+                ShippingStandardCalculation(totalWeight, sc[3], sc[4]);  // If none of the express shipping limits apply, call ShippingStandardCalculation method
+            }
         }
     }
 
@@ -197,14 +254,7 @@ class Order {
         int futureCashback = find.cashBackRedemtion(totalPrice);
         totalPrice = totalPrice - cashback;
 
-        ShippingCalculator[] sc = new ShippingCalculator[5];
-
-        for (ShippingCalculator shippingCal : shippingcal) {
-            int i = 0;
-            sc[i] = shippingCal;
-            i++;
-        }
-
+        //CHANGE FOR SHIPPING
         //CHANGE FOR SHIPPING
         if (shipping.equalsIgnoreCase("S")) {
             shippingId = 0;
@@ -213,19 +263,9 @@ class Order {
         } else {
             shippingId = 1;
             shippingType = "(express)";
-            /*Shipping Calculator for Express
-            for (ShippingCalculator sc : shippingcal) {
-                int maxWeight = sc.getMaxWeight();
-                int minWeight = sc.getMinWeight();
-                String shiptype = sc.getShippingType();
-                if (totalWeight <= maxWeight && minWeight < totalWeight && shipping.equalsIgnoreCase(shiptype)) {
-                    shippingPrice = sc.getFee();
-                } else {
-                    shippingId = 0;
-                    shippingType = "(standard)";
-                }
-            }*/
         }
+
+        ShippingCalculation(totalWeight, shippingcal);
 
         finalBill = totalPrice + 0;
 
@@ -264,8 +304,9 @@ class Order {
     }
 }
 
-abstract class ShippingCalculator implements Comparable<ShippingCalculator> {
+class ShippingCalculator implements Comparable<ShippingCalculator> {
 
+    // Private instance variables to store shipping type, fee type, weight, and fee amounts
     private String shipping_type;
     private String fee_type;
     private int emin_weight;
@@ -278,32 +319,43 @@ abstract class ShippingCalculator implements Comparable<ShippingCalculator> {
     private int weight;
     private int fee;
 
+    // Override the compareTo method to sort ShippingCalculators by shipping type, fee type, emin_weight, and emax_weight
     @Override
     public int compareTo(ShippingCalculator other) {
 
-        int result = this.shipping_type.compareTo(other.shipping_type);
-        if (result != 0) {
-            return result;
+        // Compare by shipping type, E first then S
+        int shippingTypeComparison = this.getShippingType().compareTo(other.getShippingType());
+        if (shippingTypeComparison != 0) {
+            if (this.getShippingType().equals("E")) {
+                return -1;
+            } else if (this.getShippingType().equals("S") && other.getShippingType().equals("E")) {
+                return 1;
+            } else {
+                return 0;
+            }
         }
 
-        result = this.fee_type.compareTo(other.fee_type);
-        if (result != 0) {
-            return result;
+        // Compare by fee type, F first then V
+        int feeTypeComparison = this.getFeeType().compareTo(other.getFeeType());
+        if (feeTypeComparison != 0) {
+            if (this.getFeeType().equals("F")) {
+                return -1;
+            } else {
+                return 1;
+            }
         }
 
-        result = Integer.compare(this.emax_weight, other.emax_weight);
-        if (result != 0) {
-            return result;
+        // Compare emin_weight, from the least to the most
+        int eminWeightCmp = Integer.compare(this.emin_weight, other.emin_weight);
+        if (eminWeightCmp != 0) {
+            return eminWeightCmp;
         }
 
-        result = Integer.compare(this.smax_weight, other.smax_weight);
-        if (result != 0) {
-            return result;
-        }
-
-        return Integer.compare(this.weight, other.weight);
+        // Compare emax_weight, from the least to the most
+        return Integer.compare(this.emax_weight, other.emax_weight);
     }
 
+    // Public getter methods for private instance variables
     public String getShippingType() {
         return shipping_type;
     }
@@ -325,15 +377,15 @@ abstract class ShippingCalculator implements Comparable<ShippingCalculator> {
     }
 
     public int getStandardMinWeight() {
-        return emin_weight;
+        return smin_weight;
     }
 
     public int getStandardMaxWeight() {
-        return emax_weight;
+        return smax_weight;
     }
 
     public int getStandardFee() {
-        return efee;
+        return sfee;
     }
 
     public int getSurplusThreshold() {
@@ -348,6 +400,7 @@ abstract class ShippingCalculator implements Comparable<ShippingCalculator> {
         return fee;
     }
 
+    // Constructor to create a new ShippingCalculator object
     public ShippingCalculator(String st, String ft, int miw, int maw, int f) {
         shipping_type = st;
         fee_type = ft;
