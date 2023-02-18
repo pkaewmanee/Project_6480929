@@ -25,12 +25,10 @@ public class Project {
 
         FileHandler FH = new FileHandler(path, productInFile);
         FH.wrongProductFile_loop(P);
-        System.out.println("Read products from file " + path + productInFile + "\n");
 
         ArrayList<ShippingCalculator> shipping = new ArrayList<>();
         FileHandler SHF = new FileHandler(path, shippingInFile);
         SHF.wrongShippingFile_loop(shipping);
-        System.out.println("Read shipping from file " + path + shippingInFile + "\n");
 
         //GET RID ONCE HAVE SHIPPING
         //Handling Orders Errors
@@ -40,7 +38,6 @@ public class Project {
         //Adding each new customer
         ArrayList<Customer> c = new ArrayList<>();
         OFH.wrongOrderFile_loop(orders, c);
-        System.out.println("Read orders from file " + path + orderInFile + "\n");
 
         //Order processing and printing
         System.out.printf("\n==== Order Processing ====");
@@ -476,6 +473,7 @@ class FileHandler {
     public void wrongProductFile_loop(Product[] P) {
         boolean opensuccess = false;
         int i = 0;
+        System.out.println("Read products from file " + path + fileName + "\n");
         while (!opensuccess) {
             try (Scanner fileScan = new Scanner(new File(path + fileName))) {
                 opensuccess = true;
@@ -485,10 +483,16 @@ class FileHandler {
                 }
             } catch (FileNotFoundException e) {
                 System.out.println(e);
-                System.out.println("New file name = ");
+                System.out.println("\nEnter file name for products: ");
                 fileName = keyboardScan.next();
+                File inputFile = new File(path + fileName);
+                if (inputFile.exists()) {
+                    //fileName = inputFileName;
+                    System.out.println("Read products from file " + path + fileName);
+                } 
                 System.out.print("\n");
             }
+
         }
     }
 
@@ -556,6 +560,7 @@ class FileHandler {
 
     public void wrongOrderFile_loop(ArrayList<Order> o, ArrayList<Customer> c) {
         boolean opensuccess = false;
+        System.out.println("Read orders from file " + path + fileName + "\n");
         while (!opensuccess) {
             try (Scanner fileScan = new Scanner(new File(path + fileName))) {
                 opensuccess = true;
@@ -564,8 +569,12 @@ class FileHandler {
                 }
             } catch (FileNotFoundException e) {
                 System.out.println(e);
-                System.out.println("New file name = ");
+                System.out.println("\nEnter file name for orders: ");
                 fileName = keyboardScan.next();
+                File inputFile = new File(path + fileName);
+                if (inputFile.exists()){
+                    System.out.println("Read orders from file " + path + fileName);
+                }
                 System.out.print("\n");
             }
         }
@@ -593,6 +602,7 @@ class FileHandler {
 
     public void wrongShippingFile_loop(ArrayList<ShippingCalculator> sc) {
         boolean opensuccess = false;
+        System.out.println("Read shipping from file " + path + fileName + "\n");
         while (!opensuccess) {
             try (Scanner fileScan = new Scanner(new File(path + fileName))) {
                 opensuccess = true;
@@ -601,8 +611,12 @@ class FileHandler {
                 }
             } catch (FileNotFoundException e) {
                 System.out.println(e);
-                System.out.println("New file name = ");
+                System.out.println("\nEnter file name for shipping: ");
                 fileName = keyboardScan.next();
+                File inputFile = new File(path + fileName);
+                if(inputFile.exists()){
+                    System.out.println("Read products from file " + path + fileName);
+                }
                 System.out.print("\n");
             }
         }
