@@ -577,6 +577,13 @@ class FileHandler {
                 } catch (MissingFormatException e) {
                     System.out.println(e);
                     System.out.println(line);
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    System.out.println(e);
+                    System.out.println(line);
+                    System.out.print("Original [" + line + "] =========> ");
+                    System.out.printf("Correction [%d, %s, %s, %d, %d, %d, %d, %d]\n\n", orderNum, name, shipping,
+                        order[0], order[1], order[2], order[3], order[4]);
+                    order[i] = 0;
                 }
             }
 
