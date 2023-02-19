@@ -13,12 +13,12 @@ import java.util.*;
  *
  * @author korn
  */
-public class Project {
+public class Project1_6480279 {
 
     public static void main(String args[]) {
 
         Product P[] = new Product[5];
-        String path = "src/main/java/Project_6480929/";
+        String path = "src/main/java/Project1_6480929/";
         String productInFile = "products.txt";
         String orderInFile = "orders_errors.txt";
         String shippingInFile = "shipping.txt";
