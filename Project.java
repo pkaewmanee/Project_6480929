@@ -532,6 +532,7 @@ class FileHandler {
     }
 
     public void orderFileProcessLine(ArrayList<Order> o, String line, ArrayList<Customer> c) {
+        boolean correctionMade = false;
         try {
             String[] buf = line.split(",");
 
@@ -565,37 +566,25 @@ class FileHandler {
                         order[i] = 0;
                         throw new InvalidInputException("For input: " + buf[i + 3].trim());
                     }
-                } catch (NumberFormatException e) {
+                } catch (NumberFormatException | InvalidInputException | MissingFormatException e) {
+                    correctionMade = true;
                     System.out.println(e);
-                    System.out.println(line);
-                    System.out.print("Original [" + line + "] =========> ");
-                    System.out.printf("Correction [%d, %s, %s, %d, %d, %d, %d, %d]\n\n", orderNum, name, shipping,
-                            order[0], order[1], order[2], order[3], order[4]);
-                } catch (InvalidInputException e) {
-                    System.out.println(e);
-                    System.out.println(line);
-                    System.out.print("Original [" + line + "] =========> ");
-                    System.out.printf("Correction [%d, %s, %s, %d, %d, %d, %d, %d]\n\n", orderNum, name, shipping,
-                    order[0], order[1], order[2], order[3], order[4]);
-                } catch (MissingFormatException e) {
-                    System.out.println(e);
-                    System.out.println(line);
-                    System.out.print("Original [" + line + "] =========> ");
-                    System.out.printf("Correction [%d, %s, %s, %d, %d, %d, %d, %d]\n\n", orderNum, name, shipping,
-                    order[0], order[1], order[2], order[3], order[4]);
                 } catch (ArrayIndexOutOfBoundsException e) {
+                    correctionMade = true;
                     System.out.println(e);
-                    System.out.println(line);
-                    System.out.print("Original [" + line + "] =========> ");
-                    System.out.printf("Correction [%d, %s, %s, %d, %d, %d, %d, %d]\n\n", orderNum, name, shipping,
-                        order[0], order[1], order[2], order[3], order[4]);
                     order[i] = 0;
                 }
+            }
+            if(correctionMade){
+                System.out.print("Original [" + line + "] =========> ");
+                System.out.printf("Correction [%d, %s, %s, %d, %d, %d, %d, %d]\n\n", orderNum, name, shipping,
+                order[0], order[1], order[2], order[3], order[4]);
             }
 
             Order addNew = new Order(orderNum, name, shipping, order[0], order[1],
                     order[2], order[3], order[4], c);
             o.add(addNew);
+            
         } catch (RuntimeException e) {
             System.out.println(e);
             System.out.println(line + "\n");
