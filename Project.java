@@ -4,7 +4,7 @@ Phakkhapon Kaewmanee 6480929
 Supakorn Unjindamanee 6480279
 Jawit Poopradit      6480087
  */
-package Project_6480929;
+package Project_648092;
 
 import java.io.*;
 import java.util.*;
@@ -13,12 +13,12 @@ import java.util.*;
  *
  * @author korn
  */
-public class Project1_6480279 {
+public class Project {
 
     public static void main(String args[]) {
 
         Product P[] = new Product[5];
-        String path = "src/main/java/Project1_6480929/";
+        String path = "src/main/java/Project_6480929/";
         String productInFile = "products.txt";
         String OIF[] = {"orders.txt", "orders_errors.txt"};
         String orderInFile = OIF[1]; // 0 for orders.txt and 1 for orders_errors.txt
