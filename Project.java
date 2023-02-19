@@ -48,11 +48,12 @@ public class Project1_6480279 {
         for(int t = 0 ; t<5 ; t++){
             System.out.printf("Total item %d: ", t+1); System.out.println(P[t].returnUnits());
         }*/
+        Arrays.sort(P, (p1, p2) -> p2.calculateTotalSales(p2.returnUnits()) - p1.calculateTotalSales(p1.returnUnits()));
         System.out.println("===== Product Summary =====");
         for (int t = 0; t < 5; t++) {
             Product currentProduct = P[t];
             System.out.printf("%17s  %15s %,7d, %2d units\n",currentProduct.returnName(),"Total sales:",currentProduct.calculateTotalSales(currentProduct.returnUnits()),currentProduct.returnUnits());
-}
+        }
 
         
     }
