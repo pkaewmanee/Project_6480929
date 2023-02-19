@@ -89,7 +89,7 @@ class Product {
         int totalSales = units * productPrice;
         return totalSales;
     }
-    /////////HERERERERERERE//////////
+    
     public int calculateTotalUnits(int units) {
         totalUnits += units;
         return totalUnits;
