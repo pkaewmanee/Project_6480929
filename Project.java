@@ -44,7 +44,17 @@ public class Project {
         for (Order o : orders) {
             o.orderProcessing(P, c, shipping);
         }
+        /*System.out.println("===== Product Summary =====");
+        for(int t = 0 ; t<5 ; t++){
+            System.out.printf("Total item %d: ", t+1); System.out.println(P[t].returnUnits());
+        }*/
+        System.out.println("===== Product Summary =====");
+        for (int t = 0; t < 5; t++) {
+            Product currentProduct = P[t];
+            System.out.printf("%17s  %15s %,7d, %2d units\n",currentProduct.returnName(),"Total sales:",currentProduct.calculateTotalSales(currentProduct.returnUnits()),currentProduct.returnUnits());
+}
 
+        
     }
 }
 
@@ -77,6 +87,17 @@ class Product {
         int totalSales = units * productPrice;
         return totalSales;
     }
+    /////////HERERERERERERE//////////
+    public int calculateTotalUnits(int units) {
+        totalUnits += units;
+        return totalUnits;
+    }
+
+    public int returnUnits() {
+        return totalUnits;
+    }
+    
+    
 }
 
 class Customer {
@@ -168,10 +189,22 @@ class Order {
             c.add(addCustomer);
         }
     }
-
+    
+    public int getItem1(){
+        return item1;
+    }
     public void orderProcessing(Product p[], ArrayList<Customer> c, ArrayList<ShippingCalculator> shippingcal) {
         totalPrice = 0;
         totalWeight = 0;
+
+        int[] itemQuantities = {item1, item2, item3, item4, item5};
+    
+        // Calculate total quantity of each item
+        for (int i = 0; i < p.length; i++) {
+            p[i].calculateTotalUnits(itemQuantities[i]);
+        }
+
+        
 
         //Calcualte total price and weight
         for (int i = 0; i < p.length; i++) {
