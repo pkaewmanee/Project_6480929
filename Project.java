@@ -52,10 +52,9 @@ public class Project {
         System.out.println("===== Product Summary =====");
         for (int t = 0; t < 5; t++) {
             Product currentProduct = P[t];
-            System.out.printf("%17s  %15s %,7d, %2d units\n",currentProduct.returnName(),"Total sales:",currentProduct.calculateTotalSales(currentProduct.returnUnits()),currentProduct.returnUnits());
+            System.out.printf("%17s  %15s %,7d, %2d units\n", currentProduct.returnName(), "Total sales:", currentProduct.calculateTotalSales(currentProduct.returnUnits()), currentProduct.returnUnits());
         }
 
-        
     }
 }
 
@@ -88,7 +87,7 @@ class Product {
         int totalSales = units * productPrice;
         return totalSales;
     }
-    
+
     public int calculateTotalUnits(int units) {
         totalUnits += units;
         return totalUnits;
@@ -97,8 +96,7 @@ class Product {
     public int returnUnits() {
         return totalUnits;
     }
-    
-    
+
 }
 
 class Customer {
@@ -190,22 +188,21 @@ class Order {
             c.add(addCustomer);
         }
     }
-    
-    public int getItem1(){
+
+    public int getItem1() {
         return item1;
     }
+
     public void orderProcessing(Product p[], ArrayList<Customer> c, ArrayList<ShippingCalculator> shippingcal) {
         totalPrice = 0;
         totalWeight = 0;
 
         int[] itemQuantities = {item1, item2, item3, item4, item5};
-    
+
         // Calculate total quantity of each item
         for (int i = 0; i < p.length; i++) {
             p[i].calculateTotalUnits(itemQuantities[i]);
         }
-
-        
 
         //Calcualte total price and weight
         for (int i = 0; i < p.length; i++) {
@@ -523,7 +520,7 @@ class FileHandler {
                 if (inputFile.exists()) {
                     //fileName = inputFileName;
                     System.out.println("Read products from file " + path + fileName);
-                } 
+                }
                 System.out.print("\n");
             }
 
@@ -546,9 +543,9 @@ class FileHandler {
                 try {
                     if (buf.length < 8 && shipping.matches("\\d+")) {
                         shipping = "S";
-                        j = 1;
-                        order[0] = Integer.parseInt(buf[2].trim());
-                        throw new MissingFormatException(" 1 columns missing");
+                        //j = 1;
+                        //order[0] = Integer.parseInt(buf[2].trim());
+                        //throw new MissingFormatException(" 1 columns missing");
                     }
 
                     if (!"E".equalsIgnoreCase(shipping) && !"S".equalsIgnoreCase(shipping) && shipping.matches("\\d+")) {
@@ -566,25 +563,27 @@ class FileHandler {
                         order[i] = 0;
                         throw new InvalidInputException("For input: " + buf[i + 3].trim());
                     }
+                    
                 } catch (NumberFormatException | InvalidInputException | MissingFormatException e) {
                     correctionMade = true;
                     System.out.println(e);
                 } catch (ArrayIndexOutOfBoundsException e) {
+                    e = new MissingFormatException(" 1 columns missing");
                     correctionMade = true;
                     System.out.println(e);
                     order[i] = 0;
                 }
             }
-            if(correctionMade){
+            if (correctionMade) {
                 System.out.print("Original [" + line + "] =========> ");
                 System.out.printf("Correction [%d, %s, %s, %d, %d, %d, %d, %d]\n\n", orderNum, name, shipping,
-                order[0], order[1], order[2], order[3], order[4]);
+                        order[0], order[1], order[2], order[3], order[4]);
             }
 
             Order addNew = new Order(orderNum, name, shipping, order[0], order[1],
                     order[2], order[3], order[4], c);
             o.add(addNew);
-            
+
         } catch (RuntimeException e) {
             System.out.println(e);
             System.out.println(line + "\n");
@@ -605,7 +604,7 @@ class FileHandler {
                 System.out.println("\nEnter file name for orders: ");
                 fileName = keyboardScan.next();
                 File inputFile = new File(path + fileName);
-                if (inputFile.exists()){
+                if (inputFile.exists()) {
                     System.out.println("Read orders from file " + path + fileName);
                 }
                 System.out.print("\n");
@@ -647,7 +646,7 @@ class FileHandler {
                 System.out.println("\nEnter file name for shipping: ");
                 fileName = keyboardScan.next();
                 File inputFile = new File(path + fileName);
-                if(inputFile.exists()){
+                if (inputFile.exists()) {
                     System.out.println("Read products from file " + path + fileName);
                 }
                 System.out.print("\n");
