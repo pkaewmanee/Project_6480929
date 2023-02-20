@@ -4,7 +4,7 @@ Phakkhapon Kaewmanee 6480929
 Supakorn Unjindamanee 6480279
 Jawit Poopradit      6480087
  */
-package Project_648092;
+package Project_6480929;
 
 import java.io.*;
 import java.util.*;
@@ -557,6 +557,7 @@ class FileHandler {
                     } else if (!"E".equalsIgnoreCase(shipping) && !"S".equalsIgnoreCase(shipping)) {
                         shipping = "S";
                         order[i] = Integer.parseInt(buf[i + 3].trim());
+                        throw new InvalidInputException("For input: " + buf[2].trim()); //ADD THIS LINE AT 20 Feb
                     } else {
                         order[i] = Integer.parseInt(buf[i + 3 - j].trim());
                     }
