@@ -9,10 +9,6 @@ package Project_6480929;
 import java.io.*;
 import java.util.*;
 
-/**
- *
- * @author korn
- */
 public class Project {
 
     public static void main(String args[]) {
@@ -20,7 +16,8 @@ public class Project {
         Product P[] = new Product[5];
         String path = "src/main/java/Project_6480929/";
         String productInFile = "products.txt";
-        String orderInFile = "orders_errors.txt";
+        //String orderInFile = "orders_errors.txt";
+         String orderInFile = "orders.txt";
         String shippingInFile = "shipping.txt";
 
         FileHandler FH = new FileHandler(path, productInFile);
@@ -543,9 +540,6 @@ class FileHandler {
                 try {
                     if (buf.length < 8 && shipping.matches("\\d+")) {
                         shipping = "S";
-                        //j = 1;
-                        //order[0] = Integer.parseInt(buf[2].trim());
-                        //throw new MissingFormatException(" 1 columns missing");
                     }
 
                     if (!"E".equalsIgnoreCase(shipping) && !"S".equalsIgnoreCase(shipping) && shipping.matches("\\d+")) {
@@ -554,7 +548,7 @@ class FileHandler {
                     } else if (!"E".equalsIgnoreCase(shipping) && !"S".equalsIgnoreCase(shipping)) {
                         shipping = "S";
                         order[i] = Integer.parseInt(buf[i + 3].trim());
-                        throw new InvalidInputException("For input: " + buf[2].trim()); //ADD THIS LINE AT 20 Feb
+                        throw new InvalidInputException("For input: " + buf[2].trim());
                     } else {
                         order[i] = Integer.parseInt(buf[i + 3 - j].trim());
                     }
